@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const debug_key = 'I146MSUP58PYLZ7';
 
-		// Function to extract URL parameters
     function getURLParameter(name) {
         return new URLSearchParams(window.location.search).get(name);
     }
 
-// Function to generate a random numeric value with specified digits
+    // Function to generate a random numeric value with specified digits
     function generateNumeric(digits) {
         const max = Math.pow(10, digits) - 1;
         const randomNumber = Math.floor(Math.random() * (max + 1));
