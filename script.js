@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    // Split the URL at the '?' and take the first part (everything before the query parameters)
 	    return window.location.href.split('?')[0];
 	}
-	    
+
         const ipData = await fetchIPData();
 	const filteredEmbedURL = getFilteredURL();
 
