@@ -96,10 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	function getFilteredURL() {
 	    const url = new URL(window.location.href);
 
-	    // Return only the origin and pathname (protocol, domain, and path), no parameters
-	    return `${url.origin}${url.pathname}`;
+	    // Check if the URL has any search parameters
+	    if (url.search) {
+	        // Return only the origin and pathname (protocol, domain, and path) without any parameters
+	        return `${url.origin}${url.pathname}`;
+	    } else {
+	        // If there are no search parameters, just return the full URL without modification
+	        return `${url.origin}${url.pathname}`;
+	    }
 	}
-	    
+
         const ipData = await fetchIPData();
 	const filteredEmbedURL = getFilteredURL();
 
