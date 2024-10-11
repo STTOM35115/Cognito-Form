@@ -94,18 +94,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Function to filter out the 'msg' parameter from the URL
 	function getFilteredURL() {
-	    const url = new URL(window.location.href);
-
-	    // Check if the URL has any search parameters
-	    if (url.search) {
-	        // Return only the origin and pathname (protocol, domain, and path) without any parameters
-	        return `${url.origin}${url.pathname}`;
-	    } else {
-	        // If there are no search parameters, just return the full URL without modification
-	        return `${url.origin}${url.pathname}`;
-	    }
+	    // Split the URL at the '?' and take the first part (everything before the query parameters)
+	    return window.location.href.split('?')[0];
 	}
-
+	    
         const ipData = await fetchIPData();
 	const filteredEmbedURL = getFilteredURL();
 
