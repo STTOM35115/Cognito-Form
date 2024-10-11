@@ -94,18 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Function to filter out the 'msg' parameter from the URL
 	function getFilteredURL() {
-        	const url = new URL(window.location.href);
-        	const params = new URLSearchParams(url.search);
+	    const url = new URL(window.location.href);
 
-        	// Remove 'msg' parameter if it exists
-        	if (params.has('msg')) {
-            		params.delete('msg');
-        	}
-
-        	// Rebuild the URL without 'msg' parameter
-        	return `${url.origin}${url.pathname}?${params.toString()}`;
-    	}
-
+	    // Return only the origin and pathname (protocol, domain, and path), no parameters
+	    return `${url.origin}${url.pathname}`;
+	}
+	    
         const ipData = await fetchIPData();
 	const filteredEmbedURL = getFilteredURL();
 
