@@ -92,11 +92,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+	// Function to filter out the 'msg' parameter from the URL
+	function getFilteredURL() {
+        	const url = new URL(window.location.href);
+        	const params = new URLSearchParams(url.search);
+
+        	// Remove 'msg' parameter if it exists
+        	if (params.has('msg')) {
+            		params.delete('msg');
+        	}
+
+        	// Rebuild the URL without 'msg' parameter
+        	return `${url.origin}${url.pathname}?${params.toString()}`;
+    	}
+
         const ipData = await fetchIPData();
+	const filteredEmbedURL = getFilteredURL();
 
         var prefillData = {
             "IsEmbedded": "Yes",
-            "EmbedURL": window.location.href,
+            "EmbedURL": filteredEmbedURL,
             "RandomValues": {
                 "_4DigitPin1": generateNumeric(4),
                 "_4DigitPin2": generateNumeric(4),
@@ -114,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             "OtherValues": {
                 "IsEmbedded": "Yes",
-                "EmbedURL": window.location.href,
+                "EmbedURL": filteredEmbedURL,
                 "UserLanguage": navigator.language.startsWith('en') ? "TRUE" : navigator.language.startsWith('es') ? "FALSE" : undefined,
                 "HashedIP": ipData ? await hashIPtoBase36(ipData.ip) : '',
                 "UserZipCode": ipData ? ipData.zip : ''
