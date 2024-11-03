@@ -50,56 +50,83 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Prefill form with logic to ensure Cognito is loaded
 	async function prefillForm() {
-			if (typeof Cognito === 'undefined' || !Cognito.prefill) {
-				console.error('Cognito is not loaded');
-				displayError();
-				return;
-			}
+		if (typeof Cognito === 'undefined' || !Cognito.prefill) {
+			console.error('Cognito is not loaded');
+			displayError();
+			return;
+		}
 
-			// Function to filter out the 'msg' parameter from the URL
-			function getFilteredURL() {
-				// Split the URL at the '?' and take the first part (everything before the query parameters)
-				return window.location.href.split('?')[0];
-			}
+		// Function to filter out the 'msg' parameter from the URL
+		function getFilteredURL() {
+			// Split the URL at the '?' and take the first part (everything before the query parameters)
+			return window.location.href.split('?')[0];
+		}
 
-			const filteredEmbedURL = getFilteredURL();
+		const filteredEmbedURL = getFilteredURL();
 
-			// Check for the form-key parameter and validate it
-			const formkey = getURLParameter('form-key');
+		// Check for the form-key parameter and validate it
+		const formkey = getURLParameter('form-key');
 
-			var prefillData = {
+		var prefillData = {
+			"IsEmbedded": "Yes",
+			"EmbedURL": filteredEmbedURL,
+			"RandomValues": {
+				"_4DigitPin1": generateNumeric(4),
+				"_4DigitPin2": generateNumeric(4),
+				"_6DigitPin1": generateNumeric(6),
+				"_6DigitPin2": generateNumeric(6),
+				"_6DigitHex1": generateRandomHex(6),
+				"_6DigitHex2": generateRandomHex(6),
+				"_8Digit09AZ1": generateRandomBase32(8),
+				"_8Digit09AZ2": generateRandomBase32(8),
+				"_16Digit09AZ1": generateRandomBase32(16),
+				"_16Digit09AZ2": generateRandomBase32(16),
+				"Unique1": generateUniqueCode(),
+				"Unique2": generateUniqueCode(),
+				"Unique3": generateUnique3()
+			},
+			"OtherValues": {
 				"IsEmbedded": "Yes",
 				"EmbedURL": filteredEmbedURL,
-				"RandomValues": {
-					"_4DigitPin1": generateNumeric(4),
-					"_4DigitPin2": generateNumeric(4),
-					"_6DigitPin1": generateNumeric(6),
-					"_6DigitPin2": generateNumeric(6),
-					"_6DigitHex1": generateRandomHex(6),
-					"_6DigitHex2": generateRandomHex(6),
-					"_8Digit09AZ1": generateRandomBase32(8),
-					"_8Digit09AZ2": generateRandomBase32(8),
-					"_16Digit09AZ1": generateRandomBase32(16),
-					"_16Digit09AZ2": generateRandomBase32(16),
-					"Unique1": generateUniqueCode(),
-					"Unique2": generateUniqueCode(),
-					"Unique3": generateUnique3()
-				},
-				"OtherValues": {
-					"IsEmbedded": "Yes",
-					"EmbedURL": filteredEmbedURL,
-					"UserLanguage": navigator.language.startsWith('en') ? "TRUE" : navigator.language.startsWith('es') ? "FALSE" : undefined,
-					"FormKey": formkey
-				}
-			};
-
-			if (isDarkMode()) {
-				prefillData.OtherValues.Theme = "dark";
-			} else {
-				prefillData.OtherValues.Theme = "light";
+				"UserLanguage": navigator.language.startsWith('en') ? "TRUE" : navigator.language.startsWith('es') ? "FALSE" : undefined,
+				"FormKey": formkey
 			}
+		};
 
-			Cognito.prefill(prefillData);
+		function populatePrefillDataFromURL() {
+			// Check if the URL contains the "prefillvalues" parameter
+			const urlParams = new URLSearchParams(window.location.search);
+    			const prefillValues = urlParams.get('prefillvalues');
+
+    			// If "prefillvalues" parameter is found, process it
+    			if (prefillValues) {
+        			// Split the parameter by '|' to get each name/value pair
+        			const pairs = prefillValues.split('|');
+
+        			// Initialize an empty object for prefillData
+        			const prefillData = {};
+
+        			// Loop through each name/value pair
+        			pairs.forEach(pair => {
+            				// Split each pair by '/' to separate name and value
+            				const [name, value] = pair.split('/');
+
+            				// If both name and value are present, add to prefillData
+            				if (name && value) {
+                				prefillData[name] = value;
+            				}
+        			});
+    			}
+		}
+		populatePrefillDataFromURL()
+
+		if (isDarkMode()) {
+			prefillData.OtherValues.Theme = "dark";
+		} else {
+			prefillData.OtherValues.Theme = "light";
+		}
+
+		Cognito.prefill(prefillData);
 	}
 
 	// Display error if Cognito fails to load
@@ -112,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function applyDarkModeStylesToCognito() {
-    		const form = document.querySelector('.cog-form');
+    	const form = document.querySelector('.cog-form');
 		if (form) {
 			applyDarkModeCSS();
 		} else {
