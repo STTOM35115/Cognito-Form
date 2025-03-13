@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		} else {
 			prefillData.OtherValues.Theme = "light";
 		}
-
+		console.log(prefillData);
 		Cognito.prefill(prefillData);
 	}
 
