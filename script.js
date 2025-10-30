@@ -151,14 +151,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		    return prefillData;
 		}
 		
-		populatePrefillDataFromURL();
+		const prefillData = populatePrefillDataFromURL();
 
 		if (isDarkMode()) {
 			prefillData.OtherValues.Theme = "dark";
 		} else {
 			prefillData.OtherValues.Theme = "light";
 		}
-		console.log(prefillData);
+		// console.log(prefillData);
 		Cognito.prefill(prefillData);
 	}
 
