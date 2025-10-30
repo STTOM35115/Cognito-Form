@@ -95,23 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 		function populatePrefillDataFromURL() {
-		    // Parse query parameters
 		    const urlParams = new URLSearchParams(window.location.search);
 		    const prefillValues = urlParams.get('prefillvalues');
-		    const prefillData = {};
 		
 		    if (prefillValues) {
-		        // Split the parameter by '|' to get each name/value pair
 		        const pairs = prefillValues.split('|');
-		
-		        // Keep track of pairs that should remain visible in the URL
 		        const visiblePairs = [];
 		
 		        pairs.forEach(pair => {
 		            const [name, value] = pair.split('/');
 		
 		            if (name && value) {
-		                // Handle nested keys using dot notation (e.g., Section.Field)
+		                // Handle nested keys (dot notation)
 		                const nameParts = name.split('.');
 		                let current = prefillData;
 		
@@ -123,17 +118,16 @@ document.addEventListener('DOMContentLoaded', function() {
 		                    current = current[part];
 		                }
 		
-		                // Assign the final value
 		                current[nameParts[nameParts.length - 1]] = value;
 		
-		                // If this field name includes "FormSecret", remove it from the URL
+		                // Remove from URL if it includes "FormSecret"
 		                if (!name.includes('FormSecret')) {
 		                    visiblePairs.push(pair);
 		                }
 		            }
 		        });
 		
-		        // Update the URL to remove "FormSecret" fields from the UI
+		        // Rebuild URL without FormSecret values
 		        const newPrefillValues = visiblePairs.join('|');
 		        const newUrlParams = new URLSearchParams(window.location.search);
 		
@@ -143,14 +137,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		            newUrlParams.delete('prefillvalues');
 		        }
 		
-		        // Replace the URL in the browser without reloading the page
 		        const newUrl = `${window.location.origin}${window.location.pathname}${newUrlParams.toString() ? '?' + newUrlParams.toString() : ''}`;
 		        window.history.replaceState({}, document.title, newUrl);
 		    }
-		
-		    return prefillData;
 		}
-		
+
 		populatePrefillDataFromURL();
 
 		if (isDarkMode()) {
