@@ -93,32 +93,65 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		};
 
+
 		function populatePrefillDataFromURL() {
-			// Check if the URL contains the "prefillvalues" parameter
-			const urlParams = new URLSearchParams(window.location.search);
-    			const prefillValues = urlParams.get('prefillvalues');
-
-    			// If "prefillvalues" parameter is found, process it
-    			if (prefillValues) {
-        			// Split the parameter by '|' to get each name/value pair
-        			const pairs = prefillValues.split('|');
-
-        			// Initialize an empty object for prefillData
-        			// const prefillData = {};
-
-        			// Loop through each name/value pair
-        			pairs.forEach(pair => {
-            				// Split each pair by '/' to separate name and value
-            				const [name, value] = pair.split('/');
-
-            				// If both name and value are present, add to prefillData
-            				if (name && value) {
-                				prefillData[name] = value;
-            				}
-        			});
-    			}
+		    // Parse query parameters
+		    const urlParams = new URLSearchParams(window.location.search);
+		    const prefillValues = urlParams.get('prefillvalues');
+		    const prefillData = {};
+		
+		    if (prefillValues) {
+		        // Split the parameter by '|' to get each name/value pair
+		        const pairs = prefillValues.split('|');
+		
+		        // Keep track of pairs that should remain visible in the URL
+		        const visiblePairs = [];
+		
+		        pairs.forEach(pair => {
+		            const [name, value] = pair.split('/');
+		
+		            if (name && value) {
+		                // Handle nested keys using dot notation (e.g., Section.Field)
+		                const nameParts = name.split('.');
+		                let current = prefillData;
+		
+		                for (let i = 0; i < nameParts.length - 1; i++) {
+		                    const part = nameParts[i];
+		                    if (!current[part] || typeof current[part] !== 'object') {
+		                        current[part] = {};
+		                    }
+		                    current = current[part];
+		                }
+		
+		                // Assign the final value
+		                current[nameParts[nameParts.length - 1]] = value;
+		
+		                // If this field name includes "FormSecret", remove it from the URL
+		                if (!name.includes('FormSecret')) {
+		                    visiblePairs.push(pair);
+		                }
+		            }
+		        });
+		
+		        // Update the URL to remove "FormSecret" fields from the UI
+		        const newPrefillValues = visiblePairs.join('|');
+		        const newUrlParams = new URLSearchParams(window.location.search);
+		
+		        if (newPrefillValues) {
+		            newUrlParams.set('prefillvalues', newPrefillValues);
+		        } else {
+		            newUrlParams.delete('prefillvalues');
+		        }
+		
+		        // Replace the URL in the browser without reloading the page
+		        const newUrl = `${window.location.origin}${window.location.pathname}${newUrlParams.toString() ? '?' + newUrlParams.toString() : ''}`;
+		        window.history.replaceState({}, document.title, newUrl);
+		    }
+		
+		    return prefillData;
 		}
-		populatePrefillDataFromURL()
+		
+		populatePrefillDataFromURL();
 
 		if (isDarkMode()) {
 			prefillData.OtherValues.Theme = "dark";
