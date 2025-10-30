@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		    return prefillData;
 		}
 		
-		const prefillData = populatePrefillDataFromURL();
+		populatePrefillDataFromURL();
 
 		if (isDarkMode()) {
 			prefillData.OtherValues.Theme = "dark";
